@@ -33,6 +33,35 @@ Wait ~30 seconds for all services to be healthy, then verify:
 curl http://localhost:8000/v1/health | python3 -m json.tool
 ```
 
+### Alternative: Run locally without Docker (Standalone Mode)
+
+If you don't want to deal with Docker, you can run the app directly using a virtual environment. This uses SQLite instead of PostgreSQL/ES/Redis/RabbitMQ, so no external services needed.
+
+```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy env file and make sure standalone mode is on
+cp .env.example .env
+
+# Start the server
+uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Verify it's running:
+
+```bash
+curl http://localhost:8000/v1/health | python3 -m json.tool
+```
+
+In standalone mode, ES/Redis/RabbitMQ will show as `skipped` in the health check. Search uses SQLite LIKE queries instead of Elasticsearch, and indexing happens synchronously (no worker needed).
+
+---
+
 ### 2. Seed sample data
 
 ```bash
